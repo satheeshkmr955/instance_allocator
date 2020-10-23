@@ -82,13 +82,15 @@ class ResourceAllocator {
     return this.instanceCost;
   }
 
-  getAllocateByCpusPerHour(hours, cpus) {
+  getAllocateByCpusPerHour(hours, cpus, price) {
     const instancePrice = this.getInstancePrice();
     const regions = Object.keys(instancePrice).map((region) => {
-      const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
-        instancePrice[region],
-        cpus
-      );
+      const {
+        total_cost,
+        servers,
+        total_cpus,
+        min_requested_cpus,
+      } = AllocateByCpusPerHour(instancePrice[region], cpus, price);
       let totalCostForHours = total_cost * hours;
       totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
       return {
@@ -96,21 +98,26 @@ class ResourceAllocator {
         total_cost: `$${totalCostForHours}`,
         total_cpus,
         total_hours: hours,
+        min_requested_cpus,
+        min_requested_price:
+          price !== undefined ? totalCostForHours <= price : true,
         servers,
       };
     });
     return regions;
   }
 
-  getAllocateByPricePerHour(hours, price) {
+  getAllocateByPricePerHour(hours, cpus, price) {
     const instancePrice = this.getInstancePrice();
     let pricePerHour = price / hours;
     pricePerHour = parseFloat(pricePerHour.toFixed(2));
     const regions = Object.keys(instancePrice).map((region) => {
-      const { total_cost, servers, total_cpus } = AllocateByPricePerHour(
-        instancePrice[region],
-        pricePerHour
-      );
+      const {
+        total_cost,
+        servers,
+        total_cpus,
+        min_requested_cpus,
+      } = AllocateByPricePerHour(instancePrice[region], cpus, pricePerHour);
       let totalCostForHours = total_cost * hours;
       totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
       return {
@@ -118,6 +125,8 @@ class ResourceAllocator {
         total_cost: `$${totalCostForHours}`,
         total_cpus,
         total_hours: hours,
+        min_requested_cpus,
+        min_requested_price: totalCostForHours <= price,
         servers,
       };
     });
@@ -136,14 +145,14 @@ class ResourceAllocator {
     }
     const response = { result: [] };
     if (hours && cpus && price === undefined) {
-      const regions = this.getAllocateByCpusPerHour(hours, cpus);
+      const regions = this.getAllocateByCpusPerHour(hours, cpus, price);
       response.result = regions;
     } else if (hours && cpus === undefined && price) {
-      const regions = this.getAllocateByPricePerHour(hours, price);
+      const regions = this.getAllocateByPricePerHour(hours, cpus, price);
       response.result = regions;
     } else if (hours && cpus && price) {
-      // const regions = this.getAllocateByCpusPerHour(hours, cpus);
-      const regions = this.getAllocateByPricePerHour(hours, price);
+      // const regions = this.getAllocateByCpusPerHour(hours, cpus, price);
+      const regions = this.getAllocateByPricePerHour(hours, cpus, price);
       response.result = regions;
     }
     response.result.sort((a, b) => {
