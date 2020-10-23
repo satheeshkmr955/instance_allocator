@@ -82,6 +82,48 @@ class ResourceAllocator {
     return this.instanceCost;
   }
 
+  getAllocateByCpusPerHour(hours, cpus) {
+    const instancePrice = this.getInstancePrice();
+    const regions = Object.keys(instancePrice).map((region) => {
+      const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
+        instancePrice[region],
+        cpus
+      );
+      let totalCostForHours = total_cost * hours;
+      totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
+      return {
+        region: region,
+        total_cost: `$${totalCostForHours}`,
+        total_cpus,
+        total_hours: hours,
+        servers,
+      };
+    });
+    return regions;
+  }
+
+  getAllocateByPricePerHour(hours, price) {
+    const instancePrice = this.getInstancePrice();
+    let pricePerHour = price / hours;
+    pricePerHour = parseFloat(pricePerHour.toFixed(2));
+    const regions = Object.keys(instancePrice).map((region) => {
+      const { total_cost, servers, total_cpus } = AllocateByPricePerHour(
+        instancePrice[region],
+        pricePerHour
+      );
+      let totalCostForHours = total_cost * hours;
+      totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
+      return {
+        region: region,
+        total_cost: `$${totalCostForHours}`,
+        total_cpus,
+        total_hours: hours,
+        servers,
+      };
+    });
+    return regions;
+  }
+
   get_costs({ hours, cpus, price }) {
     const { error } = costSchema.validate({
       hours,
@@ -94,62 +136,16 @@ class ResourceAllocator {
     }
     console.log(hours, cpus, price);
     if (hours && cpus && price === undefined) {
-      const instancePrice = this.getInstancePrice();
-      const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
-          instancePrice[region],
-          cpus
-        );
-        let totalCostForHours = total_cost * hours;
-        totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
-        return {
-          region: region,
-          total_cost: `$${totalCostForHours}`,
-          total_cpus,
-          total_hours: hours,
-          servers,
-        };
-      });
+      const regions = this.getAllocateByCpusPerHour(hours, cpus);
       console.dir(regions, { depth: null });
       return { result: regions };
     } else if (hours && cpus === undefined && price) {
-      const instancePrice = this.getInstancePrice();
-      let pricePerHour = price / hours;
-      pricePerHour = parseFloat(pricePerHour.toFixed(2));
-      const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers, total_cpus } = AllocateByPricePerHour(
-          instancePrice[region],
-          pricePerHour
-        );
-        let totalCostForHours = total_cost * hours;
-        totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
-        return {
-          region: region,
-          total_cost: `$${totalCostForHours}`,
-          total_cpus,
-          total_hours: hours,
-          servers,
-        };
-      });
+      const regions = this.getAllocateByPricePerHour(hours, price);
       console.dir(regions, { depth: null });
       return { result: regions };
     } else if (hours && cpus && price) {
-      const instancePrice = this.getInstancePrice();
-      const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
-          instancePrice[region],
-          cpus
-        );
-        let totalCostForHours = total_cost * hours;
-        totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
-        return {
-          region: region,
-          total_cost: `$${totalCostForHours}`,
-          total_cpus,
-          total_hours: hours,
-          servers,
-        };
-      });
+      // const regions = this.getAllocateByCpusPerHour(hours, cpus);
+      const regions = this.getAllocateByPricePerHour(hours, price);
       console.dir(regions, { depth: null });
       return { result: regions };
     }
