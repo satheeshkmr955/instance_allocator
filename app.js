@@ -96,7 +96,7 @@ class ResourceAllocator {
     if (hours && cpus && price === undefined) {
       const instancePrice = this.getInstancePrice();
       const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers } = AllocateByCpusPerHour(
+        const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
           instancePrice[region],
           cpus
         );
@@ -104,7 +104,8 @@ class ResourceAllocator {
         totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
         return {
           region: region,
-          total_cost: totalCostForHours,
+          total_cost: `$${totalCostForHours}`,
+          total_cpus,
           servers,
           hours,
         };
@@ -116,7 +117,7 @@ class ResourceAllocator {
       let pricePerHour = price / hours;
       pricePerHour = parseFloat(pricePerHour.toFixed(2));
       const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers } = AllocateByPricePerHour(
+        const { total_cost, servers, total_cpus } = AllocateByPricePerHour(
           instancePrice[region],
           pricePerHour
         );
@@ -124,7 +125,8 @@ class ResourceAllocator {
         totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
         return {
           region: region,
-          total_cost: totalCostForHours,
+          total_cost: `$${totalCostForHours}`,
+          total_cpus,
           servers,
           hours,
         };
@@ -134,7 +136,7 @@ class ResourceAllocator {
     } else if (hours && cpus && price) {
       const instancePrice = this.getInstancePrice();
       const regions = Object.keys(instancePrice).map((region) => {
-        const { total_cost, servers } = AllocateByCpusPerHour(
+        const { total_cost, servers, total_cpus } = AllocateByCpusPerHour(
           instancePrice[region],
           cpus
         );
@@ -142,7 +144,8 @@ class ResourceAllocator {
         totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
         return {
           region: region,
-          total_cost: totalCostForHours,
+          total_cost: `$${totalCostForHours}`,
+          total_cpus,
           servers,
           hours,
         };

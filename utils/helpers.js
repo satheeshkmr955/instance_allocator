@@ -25,6 +25,7 @@ helperFunc.getCheapestInstance = (obj) => {
 
 helperFunc.AllocateByCpusPerHour = (instanceObj, cpus) => {
   let total_cost = 0;
+  let total_cpus = 0;
   const servers = [];
   const maxCpuInstance = helperFunc.getMaxCpuInstances(instanceObj);
   let temp = cpus;
@@ -42,6 +43,7 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus) => {
     const instanceCost = instanceObj[serverType];
     if (no_of_cpus > 0) servers.push({ serverType, no_of_cpus });
     total_cost += no_of_cpus * instanceCost;
+    total_cpus += no_of_cpus * cpuCount[serverType];
     temp -= countOfCpu * no_of_cpus;
     index++;
   }
@@ -49,11 +51,12 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus) => {
     console.log("canNotAllocateInstance");
   }
   total_cost = parseFloat(total_cost.toFixed(2));
-  return { total_cost, servers };
+  return { total_cost, servers, total_cpus };
 };
 
 helperFunc.AllocateByPricePerHour = (instanceObj, price) => {
   let total_cost = 0;
+  let total_cpus = 0;
   const servers = [];
   const minPricedInstance = helperFunc.getCheapestInstance(instanceObj);
   let temp = price;
@@ -67,12 +70,13 @@ helperFunc.AllocateByPricePerHour = (instanceObj, price) => {
     const no_of_cpus = parseInt(temp / instanceCost);
     if (no_of_cpus > 0) servers.push({ serverType, no_of_cpus });
     total_cost += no_of_cpus * instanceCost;
+    total_cpus += no_of_cpus * cpuCount[serverType];
     temp -= no_of_cpus * instanceCost;
     temp = parseFloat(temp.toFixed(2));
     index++;
   }
   total_cost = parseFloat(total_cost.toFixed(2));
-  return { total_cost, servers };
+  return { total_cost, servers, total_cpus };
 };
 
 module.exports = helperFunc;
