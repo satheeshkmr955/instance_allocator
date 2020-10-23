@@ -27,17 +27,17 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus) => {
   let total_cost = 0;
   let total_cpus = 0;
   const servers = [];
-  const maxCpuInstance = helperFunc.getMaxCpuInstances(instanceObj);
+  const minPricedInstance = helperFunc.getCheapestInstance(instanceObj);
   let temp = cpus;
   let index = 0;
   while (temp !== 0) {
     if (
-      index >= maxCpuInstance.length ||
-      temp < cpuCount[maxCpuInstance[maxCpuInstance.length - 1]]
+      index >= minPricedInstance.length ||
+      temp < cpuCount[minPricedInstance[minPricedInstance.length - 1]]
     ) {
       break;
     }
-    const serverType = maxCpuInstance[index];
+    const serverType = minPricedInstance[index];
     const countOfCpu = cpuCount[serverType];
     const no_of_cpus = parseInt(temp / countOfCpu);
     const instanceCost = instanceObj[serverType];
