@@ -134,22 +134,26 @@ class ResourceAllocator {
       const errMsg = error.details.map((err) => err.message).toString();
       throw Error(errMsg);
     }
-    console.log(hours, cpus, price);
+    const response = { result: [] };
     if (hours && cpus && price === undefined) {
       const regions = this.getAllocateByCpusPerHour(hours, cpus);
-      console.dir(regions, { depth: null });
-      return { result: regions };
+      response.result = regions;
     } else if (hours && cpus === undefined && price) {
       const regions = this.getAllocateByPricePerHour(hours, price);
-      console.dir(regions, { depth: null });
-      return { result: regions };
+      response.result = regions;
     } else if (hours && cpus && price) {
       // const regions = this.getAllocateByCpusPerHour(hours, cpus);
       const regions = this.getAllocateByPricePerHour(hours, price);
-      console.dir(regions, { depth: null });
-      return { result: regions };
+      response.result = regions;
     }
-    return { result: [] };
+    response.result.sort((a, b) => {
+      const x = parseFloat(a.total_cost.replace("$", ""));
+      const y = parseFloat(b.total_cost.replace("$", ""));
+      return x - y;
+    });
+    console.log(hours, cpus, price);
+    console.dir(response, { depth: null });
+    return { response };
   }
 }
 

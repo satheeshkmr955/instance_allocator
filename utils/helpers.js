@@ -1,4 +1,4 @@
-const { cpuCount, instancePrice } = require("../constants");
+const { cpuCount } = require("../constants");
 
 const helperFunc = {};
 
