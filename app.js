@@ -106,8 +106,8 @@ class ResourceAllocator {
           region: region,
           total_cost: `$${totalCostForHours}`,
           total_cpus,
+          total_hours: hours,
           servers,
-          hours,
         };
       });
       console.dir(regions, { depth: null });
@@ -127,8 +127,8 @@ class ResourceAllocator {
           region: region,
           total_cost: `$${totalCostForHours}`,
           total_cpus,
+          total_hours: hours,
           servers,
-          hours,
         };
       });
       console.dir(regions, { depth: null });
@@ -146,8 +146,8 @@ class ResourceAllocator {
           region: region,
           total_cost: `$${totalCostForHours}`,
           total_cpus,
+          total_hours: hours,
           servers,
-          hours,
         };
       });
       console.dir(regions, { depth: null });
