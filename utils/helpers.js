@@ -52,7 +52,7 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus, price) => {
     total_cost,
     servers,
     total_cpus,
-    min_requested_cpus: total_cpus === cpus,
+    min_requested_cpus: total_cpus >= cpus,
   };
 };
 
@@ -82,7 +82,7 @@ helperFunc.AllocateByPricePerHour = (instanceObj, cpus, price) => {
     total_cost,
     servers,
     total_cpus,
-    min_requested_cpus: cpus !== undefined ? total_cpus === cpus : true,
+    min_requested_cpus: cpus !== undefined ? total_cpus >= cpus : true,
   };
 };
 

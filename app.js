@@ -82,54 +82,66 @@ class ResourceAllocator {
     return this.instanceCost;
   }
 
-  getAllocateByCpusPerHour(hours, cpus, price) {
+  getAllocateByCpusPerHour(hours, cpus, price, isObject = false) {
     const instancePrice = this.getInstancePrice();
-    const regions = Object.keys(instancePrice).map((region) => {
-      const {
-        total_cost,
-        servers,
-        total_cpus,
-        min_requested_cpus,
-      } = AllocateByCpusPerHour(instancePrice[region], cpus, price);
-      let totalCostForHours = total_cost * hours;
-      totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
-      return {
-        region: region,
-        total_cost: `$${totalCostForHours}`,
-        total_cpus,
-        total_hours: hours,
-        min_requested_cpus,
-        min_requested_price:
-          price !== undefined ? totalCostForHours <= price : true,
-        servers,
-      };
-    });
+    const regions = Object.keys(instancePrice).reduce(
+      (acc, region) => {
+        const {
+          total_cost,
+          servers,
+          total_cpus,
+          min_requested_cpus,
+        } = AllocateByCpusPerHour(instancePrice[region], cpus, price);
+        let totalCostForHours = total_cost * hours;
+        totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
+        const data = {
+          region: region,
+          total_cost: `$${totalCostForHours}`,
+          total_cpus,
+          total_hours: hours,
+          min_requested_cpus,
+          min_requested_price:
+            price !== undefined ? totalCostForHours <= price : true,
+          servers,
+        };
+        if (isObject) acc[region] = data;
+        else acc.push(data);
+        return acc;
+      },
+      isObject ? {} : []
+    );
     return regions;
   }
 
-  getAllocateByPricePerHour(hours, cpus, price) {
+  getAllocateByPricePerHour(hours, cpus, price, isObject = false) {
     const instancePrice = this.getInstancePrice();
     let pricePerHour = price / hours;
     pricePerHour = parseFloat(pricePerHour.toFixed(2));
-    const regions = Object.keys(instancePrice).map((region) => {
-      const {
-        total_cost,
-        servers,
-        total_cpus,
-        min_requested_cpus,
-      } = AllocateByPricePerHour(instancePrice[region], cpus, pricePerHour);
-      let totalCostForHours = total_cost * hours;
-      totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
-      return {
-        region: region,
-        total_cost: `$${totalCostForHours}`,
-        total_cpus,
-        total_hours: hours,
-        min_requested_cpus,
-        min_requested_price: totalCostForHours <= price,
-        servers,
-      };
-    });
+    const regions = Object.keys(instancePrice).reduce(
+      (acc, region) => {
+        const {
+          total_cost,
+          servers,
+          total_cpus,
+          min_requested_cpus,
+        } = AllocateByPricePerHour(instancePrice[region], cpus, pricePerHour);
+        let totalCostForHours = total_cost * hours;
+        totalCostForHours = parseFloat(totalCostForHours.toFixed(2));
+        const data = {
+          region: region,
+          total_cost: `$${totalCostForHours}`,
+          total_cpus,
+          total_hours: hours,
+          min_requested_cpus,
+          min_requested_price: totalCostForHours <= price,
+          servers,
+        };
+        if (isObject) acc[region] = data;
+        else acc.push(data);
+        return acc;
+      },
+      isObject ? {} : []
+    );
     return regions;
   }
 
@@ -151,8 +163,21 @@ class ResourceAllocator {
       const regions = this.getAllocateByPricePerHour(hours, cpus, price);
       response.result = regions;
     } else if (hours && cpus && price) {
-      // const regions = this.getAllocateByCpusPerHour(hours, cpus, price);
-      const regions = this.getAllocateByPricePerHour(hours, cpus, price);
+      const byPrice = this.getAllocateByPricePerHour(hours, cpus, price);
+      const byCpus = this.getAllocateByCpusPerHour(hours, cpus, price, true);
+      const regions = byPrice.map((data) => {
+        const instanceName = data.region;
+        const cpuInstance = byCpus[instanceName];
+        let newData = data;
+        if (
+          !(data.min_requested_cpus && data.min_requested_price) &&
+          cpuInstance.min_requested_cpus &&
+          cpuInstance.min_requested_price
+        ) {
+          newData = cpuInstance;
+        }
+        return newData;
+      });
       response.result = regions;
     }
     response.result.sort((a, b) => {
