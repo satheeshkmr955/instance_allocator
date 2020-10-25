@@ -34,12 +34,26 @@ npm install
 yarn install
 ```
 
-## Start
+## Link
 
-Run the below cmd to start the Resource Allocator
+Run the cmd below to use as cli
+
+### npm
 
 ```sh
-npm start
-or
-yarn start
+npm link
+```
+
+### yarn
+
+```sh
+yarn link
+```
+
+## Start
+
+Run the below cmd to get the optimizated CPU instance per region
+
+```sh
+instance_allocator -h 7 -c 214 -p 95
 ```
