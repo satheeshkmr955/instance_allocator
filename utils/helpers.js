@@ -1,15 +1,13 @@
-const { cpuCount } = require("../constants");
-
 const helperFunc = {};
 
-helperFunc.getMaxCpuInstances = (obj = {}) => {
+helperFunc.getMaxCpuInstances = (obj = {}, cpuCount) => {
   const keys = Object.keys(obj);
   const sorted = keys.sort((a, b) => cpuCount[b] - cpuCount[a]);
   return sorted;
 };
 
-helperFunc.getCheapestInstance = (obj) => {
-  const maxCpuInstance = helperFunc.getMaxCpuInstances(obj);
+helperFunc.getCheapestInstance = (obj, cpuCount) => {
+  const maxCpuInstance = helperFunc.getMaxCpuInstances(obj, cpuCount);
   const keys = Object.keys(obj);
   const newMaxCpuInstance =
     maxCpuInstance && maxCpuInstance[0]
@@ -23,11 +21,16 @@ helperFunc.getCheapestInstance = (obj) => {
   return sorted;
 };
 
-helperFunc.AllocateByCpusPerHour = (instanceObj, cpus, price) => {
+helperFunc.AllocateByCpusPerHour = (
+  minPricedInstance,
+  instanceObj,
+  cpus,
+  price,
+  cpuCount
+) => {
   let total_cost = 0;
   let total_cpus = 0;
   const servers = [];
-  const minPricedInstance = helperFunc.getCheapestInstance(instanceObj);
   let temp = cpus;
   let index = 0;
   while (temp !== 0) {
@@ -41,7 +44,7 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus, price) => {
     const countOfCpu = cpuCount[serverType];
     const no_of_cpus = parseInt(temp / countOfCpu);
     const instanceCost = instanceObj[serverType];
-    if (no_of_cpus > 0) servers.push({ serverType, no_of_cpus });
+    if (no_of_cpus > 0) servers.push({ server_type: serverType, no_of_cpus });
     total_cost += no_of_cpus * instanceCost;
     total_cpus += no_of_cpus * cpuCount[serverType];
     temp -= countOfCpu * no_of_cpus;
@@ -56,11 +59,16 @@ helperFunc.AllocateByCpusPerHour = (instanceObj, cpus, price) => {
   };
 };
 
-helperFunc.AllocateByPricePerHour = (instanceObj, cpus, price) => {
+helperFunc.AllocateByPricePerHour = (
+  minPricedInstance,
+  instanceObj,
+  cpus,
+  price,
+  cpuCount
+) => {
   let total_cost = 0;
   let total_cpus = 0;
   const servers = [];
-  const minPricedInstance = helperFunc.getCheapestInstance(instanceObj);
   let temp = price;
   let index = 0;
   while (temp >= 0) {
@@ -70,7 +78,7 @@ helperFunc.AllocateByPricePerHour = (instanceObj, cpus, price) => {
     const serverType = minPricedInstance[index];
     const instanceCost = instanceObj[serverType];
     const no_of_cpus = parseInt(temp / instanceCost);
-    if (no_of_cpus > 0) servers.push({ serverType, no_of_cpus });
+    if (no_of_cpus > 0) servers.push({ server_type: serverType, no_of_cpus });
     total_cost += no_of_cpus * instanceCost;
     total_cpus += no_of_cpus * cpuCount[serverType];
     temp -= no_of_cpus * instanceCost;
