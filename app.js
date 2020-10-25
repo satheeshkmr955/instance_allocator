@@ -10,7 +10,6 @@ const run = () => {
     const ra1 = new ResourceAllocator(instancePrice, cpuCount);
     console.dir(ra1.get_costs(data), { depth: null });
     // console.log(ra1.getInstancePrice());
-    // console.log(ra1.getBestValueInstanceByRegion());
   } catch (err) {
     console.log(err);
   }
