@@ -6,7 +6,7 @@
     "tagline": "An optimized CPU instance allocator that can assigning servers for users based on their needs",
     "docs": {
       "doc1": {
-        "title": "Setup",
+        "title": "Getting Started",
         "sidebar_label": "Setup"
       }
     },
