@@ -1,6 +1,6 @@
 ---
 id: doc1
-title: Setup
+title: Getting Started
 sidebar_label: Setup
 ---
 
