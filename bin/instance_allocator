@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+const yargs = require("yargs");
+
+const { cpuCount, instancePrice } = require("../src/constants");
+const ResourceAllocator = require("../src/index");
+
+const options = yargs
+  .usage("Usage: $0 -h <hours> -c [cpus] -p [price]")
+  .command(
+    "get_instance_price",
+    "Gives current price for instance price per region"
+  )
+  .check((args) => {
+    if (args.p || args.c) return true;
+    throw new Error("Argument check failed: price or cpus is required");
+  })
+  .example(
+    "$0 -h <hours> -c [cpus] -p [price]",
+    "Returns array of object region with total_cost, servers, etc... "
+  )
+  .option("h", {
+    alias: "hours",
+    describe: "The hours for which instances are required",
+    demandOption: "The hours is required.",
+    type: "number",
+    nargs: 1,
+  })
+  .option("c", {
+    alias: "cpus",
+    describe: "The minimum cpus required for the user",
+    // demandOption: "Either cpus or price is required.",
+    type: "number",
+    nargs: 1,
+  })
+  .option("p", {
+    alias: "price",
+    describe: "The maximum price the user willing to pay",
+    // demandOption: "Either price or cpus is required.",
+    type: "number",
+    nargs: 1,
+  }).argv;
+
+const { hours, cpus, price } = options;
+console.log(`hours: ${hours} cpus: ${cpus} price: ${price}`);
+const ra1 = new ResourceAllocator(instancePrice, cpuCount);
+const result = ra1.get_costs({ hours, cpus, price });
+console.dir(result, { depth: null });

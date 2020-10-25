@@ -1,5 +1,5 @@
-const { cpuCount, instancePrice } = require("./constants");
-const ResourceAllocator = require("./index");
+const { cpuCount, instancePrice } = require("./src/constants");
+const ResourceAllocator = require("./src/index");
 
 const run = () => {
   try {
