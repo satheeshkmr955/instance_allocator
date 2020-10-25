@@ -3,11 +3,11 @@
   "localized-strings": {
     "next": "Next",
     "previous": "Previous",
-    "tagline": "A website for testing",
+    "tagline": "An optimized CPU instance allocator that can assigning servers for users based on their needs",
     "docs": {
       "doc1": {
-        "title": "Latin-ish",
-        "sidebar_label": "Example Page"
+        "title": "Setup",
+        "sidebar_label": "Setup"
       },
       "doc2": {
         "title": "document number 2"
@@ -24,14 +24,10 @@
     },
     "links": {
       "Docs": "Docs",
-      "API": "API",
-      "Help": "Help",
-      "Blog": "Blog"
+      "Help": "Help"
     },
     "categories": {
-      "Docusaurus": "Docusaurus",
-      "First Category": "First Category",
-      "Second Category": "Second Category"
+      "Getting Started": "Getting Started"
     }
   },
   "pages-strings": {
