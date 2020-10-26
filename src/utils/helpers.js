@@ -1,11 +1,23 @@
 const helperFunc = {};
 
+/**
+ * Function - Calculate the maximum cpu count per instances per region
+ * @param {obj} object - Contains instance price per region
+ * @param {cpuCount} object - Contains instance count per region
+ * @return {sorted} array - Sorted Array from max to min cpu counted instances
+ */
 helperFunc.getMaxCpuInstances = (obj = {}, cpuCount) => {
   const keys = Object.keys(obj);
   const sorted = keys.sort((a, b) => cpuCount[b] - cpuCount[a]);
   return sorted;
 };
 
+/**
+ * Function - Calculate the instance price by region using maximum user requested price
+ * @param {obj} object - Contains instance price per region
+ * @param {cpuCount} object - Contains instance count per region
+ * @return {sorted} array - Sorted array with instance name sorted in min to max priced instance
+ */
 helperFunc.getCheapestInstance = (obj, cpuCount) => {
   const maxCpuInstance = helperFunc.getMaxCpuInstances(obj, cpuCount);
   const keys = Object.keys(obj);
@@ -21,6 +33,17 @@ helperFunc.getCheapestInstance = (obj, cpuCount) => {
   return sorted;
 };
 
+/**
+ * Function - Calculate the instance price by region using cpus quantity
+ * @param {minPricedInstance} array - Array with instance name sorted in min to max
+      priced instance
+ * @param {instanceObj} object - Contains instance price per region
+ * @param {cpus} integer - Minimum cpu requested that user need to compute
+ * @param {price} float - Maximum price requested the user willing to pay
+ * @param {cpuCount} object - Contains instance count per region
+ * @return {regions} object - Allocate the instance by using cpu quantity and
+      return object with total_cost, servers, etc... 
+  */
 helperFunc.AllocateByCpusPerHour = (
   minPricedInstance,
   instanceObj,
@@ -59,6 +82,17 @@ helperFunc.AllocateByCpusPerHour = (
   };
 };
 
+/**
+ * Function - Calculate the instance price by region using maximum user requested price
+ * @param {minPricedInstance} array - Array with instance name sorted in min to max
+      priced instance
+ * @param {instanceObj} object - Contains instance price per region
+ * @param {cpus} integer - Minimum cpu requested that user need to compute
+ * @param {price} float - Maximum price requested the user willing to pay
+ * @param {cpuCount} object - Contains instance count per region
+ * @return {regions} object - Allocate the instance by using user requested price and
+      return object with total_cost, servers, etc... 
+  */
 helperFunc.AllocateByPricePerHour = (
   minPricedInstance,
   instanceObj,

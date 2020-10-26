@@ -10,7 +10,19 @@ const {
   AllocateByPricePerHour,
 } = require("./utils/helpers");
 
+/**
+ * A Resource Allocator IIFE Function
+ * @param {price} float - Maximum price requested the user willing to pay
+ * @param {cpus} integer - Minimum cpu requested that user need to compute
+ * @param {hours} integer - Hours required for user to reserves the instances
+ * @return {ResourceAllocator} class - Using it can create new instance type and can allocate instances
+ */
 const ResourceAllocator = (function () {
+  /**
+   * Private Function - Calculate the instance price by region - private function
+   * @param {props} class instance - Get the instance cost, etc... of the class ResourceAllocator
+   * @return {object} object - Get the object of array with instance name sorted in min to max priced instance
+   */
   const calcCheapestInstanceByRegion = (props) => {
     const instanceCost = props.instanceCost;
     return Object.keys(instanceCost).reduce((acc, region) => {
@@ -22,6 +34,16 @@ const ResourceAllocator = (function () {
     }, {});
   };
 
+  /**
+   * Private Function - Calculate the instance price by region using cpus quantity
+   * @param {props} class instance - Get the instance cost, etc... of the class ResourceAllocator
+   * @param {price} float - Maximum price requested the user willing to pay
+   * @param {cpus} integer - Minimum cpu requested that user need to compute
+   * @param {hours} integer - Hours required for user to reserves the instances
+   * @param {isObject} boolean - It denotes whether the return data is array or object. Default false
+   * @return {regions} array or object - Allocate the instance by using cpu quantity and return 
+        array or object data per region
+   */
   const getAllocateByCpusPerHour = (
     props,
     hours,
@@ -66,6 +88,16 @@ const ResourceAllocator = (function () {
     return regions;
   };
 
+  /**
+   * Private Function - Calculate the instance price by region using maximum user requested price
+   * @param {props} class instance - Get the instance cost, etc... of the class ResourceAllocator
+   * @param {price} float - Maximum price requested the user willing to pay
+   * @param {cpus} integer - Minimum cpu requested that user need to compute
+   * @param {hours} integer - Hours required for user to reserves the instances
+   * @param {isObject} boolean - It denotes whether the return data is array or object. Default false
+   * @return {regions} array or object - allocate the instance by using user requested price and return 
+        array or object data per region
+   */
   const getAllocateByPricePerHour = (
     props,
     hours,
@@ -111,6 +143,11 @@ const ResourceAllocator = (function () {
     return regions;
   };
 
+  /**
+   * Private Function - Calculate the instance price by region using maximum user requested price
+   * @param {props} class instance - Get the instance cost, etc... of the class ResourceAllocator
+   * @return {regions} array - Get the object of array with instance name sorted in min to max priced instance
+   */
   const getBestValueInstanceByRegion = (props) => {
     if (props.getCheapestInstanceByRegion === null)
       props.getCheapestInstanceByRegion = calcCheapestInstanceByRegion(props);
@@ -118,6 +155,12 @@ const ResourceAllocator = (function () {
   };
 
   class ResourceAllocator {
+    /**
+     * Constructor Function - Get the data from user and instantiates
+     * @param {instanceCost} object - Instance cost per region
+     * @param {cpuCountByInstance} object - Cpu count per instance
+     * @return {void} no return
+     */
     constructor(instanceCost = {}, cpuCountByInstance = {}) {
       const { error } = RACSchema.validate({
         instanceCost,
@@ -132,10 +175,21 @@ const ResourceAllocator = (function () {
       this.getCheapestInstanceByRegion = null;
     }
 
+    /**
+     * Public Method - Get the current instance price per region
+     * @return {instanceCost} object - Instance price per region
+     */
     getInstancePrice() {
       return this.instanceCost;
     }
 
+    /**
+     * Public Method - Add or update instance by region
+     * @param {region} string - The region the user need to update the instance
+     * @param {instance} string - The name of the instance
+     * @param {cost} float - The price which user change the instance
+     * @return {void} no return
+     */
     addOrUpdateInstanceByRegion(region, instance, cost) {
       const { error } = addInstanceSchema.validate({
         region,
@@ -155,6 +209,13 @@ const ResourceAllocator = (function () {
       this.getCheapestInstanceByRegion = calcCheapestInstanceByRegion(this);
     }
 
+    /**
+     * Public Method - Delete instance by region
+     * @param {region} string - The region the user need to update the instance
+     * @param {instance} string - The name of the instance
+     * @param {cost} float - The price which user change the instance
+     * @return {void} no return
+     */
     deleteInstanceByRegion(region, instance) {
       const { error } = removeInstanceSchema.validate({
         region,
@@ -170,6 +231,14 @@ const ResourceAllocator = (function () {
       }
     }
 
+    /**
+   * Public Method - Calculate the instance price by region
+   * @param {price} float - Maximum price requested the user willing to pay
+   * @param {cpus} integer - Minimum cpu requested that user need to compute
+   * @param {hours} integer - Hours required for user to reserves the instances
+   * @return {regions} object - Returns the data containing the total_cost, servers, etc... 
+        per region for each instances
+   */
     get_costs({ hours, cpus, price }) {
       const { error } = costSchema.validate({
         hours,
